@@ -183,7 +183,7 @@ class Sheets_Logging:
 
 def measure_temp():
     """ measures temperature from raspberry Pi """
-    owm_api_key = "###"
+    owm_api_key = "5f1d3a5a193fe9ed245cd087ddc305a9"
     weather = requests.get(
         f"https://api.openweathermap.org/data/2.5/onecall?lat={47.6}&lon={-122.3}&exclude=minutely&appid={owm_api_key}&units=imperial")
     weather = weather.json()
@@ -200,11 +200,13 @@ if __name__ == '__main__':
     gsheet = Sheets_Logging()
     loop = True
     while loop:
-        data = gen_data()
+        try:
+            data = gen_data()
+        except:
+            print('error in weather retrieval')
         # sometimes encounter a random network error, try/except work around
         try:
             gsheet.write_data(data=data)
         except:
-            print('possible network error, trying again in 5 minutes to reduce cooldown')
-            sleep(300)
+            print('error in google write')
         sleep(120)
