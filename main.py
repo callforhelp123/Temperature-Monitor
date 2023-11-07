@@ -1,11 +1,15 @@
 import pickle
 import requests
+import smtplib 
 from os import path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from time import sleep
 from datetime import datetime
+from email.mime.text import MIMEText 
+from email.mime.multipart import MIMEMultipart 
+from password import returnPassword, returnOWMAPIkey
 
 class Sheets_Logging:
     """ this class holds the authorization service for the spreadsheet
@@ -181,32 +185,83 @@ class Sheets_Logging:
         # Execute the batchUpdate request to create the chart
         service.spreadsheets().batchUpdate(spreadsheetId=self.SPREADSHEET_ID, body={"requests": requests}).execute()
 
-def measure_temp():
-    """ measures temperature from raspberry Pi """
-    owm_api_key = "5f1d3a5a193fe9ed245cd087ddc305a9"
-    weather = requests.get(
-        f"https://api.openweathermap.org/data/2.5/onecall?lat={47.6}&lon={-122.3}&exclude=minutely&appid={owm_api_key}&units=imperial")
-    weather = weather.json()
-    temp = weather["current"]["temp"]
-    return temp
+class Temp_Controls:
+    def __init__(self):
+        self.boundary_temp = 51
+        self.notify = False
+        self.notify_timer = 0
+        self.time_under = ""
+    def measure_temp(self):
+        """ measures temperature from raspberry Pi """
+        owm_api_key = returnOWMAPIkey()
+        weather = requests.get(
+            f"https://api.openweathermap.org/data/2.5/onecall?lat={47.6}&lon={-122.3}&exclude=minutely&appid={owm_api_key}&units=imperial")
+        weather = weather.json()
+        temp = weather["current"]["temp"]
+        return temp
 
-def gen_data():
-    temp = measure_temp()
-    date = datetime.now()
-    return [str(date).split('.')[0], temp]
+    def gen_data(self):
+        temp = self.measure_temp()
+        date = datetime.now()
+        return [str(date).split('.')[0], temp]
+
+    def sendMail(self, curr_temp):
+        # initialize connection to gmail server
+        smtp = smtplib.SMTP('smtp.gmail.com', 587) 
+        smtp.ehlo() 
+        smtp.starttls() 
+        password = returnPassword()
+
+        ##### credentials + email destinations goes here ######
+        smtp.login('tempsensor486@gmail.com', password) 
+        to = ["snowsoftj4c@gmail.com"] 
+
+        # construct message
+        msg = MIMEMultipart() 
+        msg['Subject'] = "Warning: Temperature at " + curr_temp + "F"
+        msg_body = "Temperature has been below " + str(self.boundary_temp) + "F since " + self.time_under[0]
+        msg.attach(MIMEText(msg_body))   
+
+    
+
+        smtp.sendmail(from_addr="hello@gmail.com", 
+                    to_addrs=to, msg=msg.as_string()) 
+        smtp.quit()
 
 
 if __name__ == '__main__':
     gsheet = Sheets_Logging()
+    temp_controller = Temp_Controls()
     loop = True
     while loop:
+        # retrieve temperature info
         try:
-            data = gen_data()
+            data = temp_controller.gen_data()
         except:
             print('error in weather retrieval')
-        # sometimes encounter a random network error, try/except work around
+
+        # write to google sheet
         try:
             gsheet.write_data(data=data)
         except:
             print('error in google write')
+
+
+        # email notification if temp is past boundary temp
+        if data[1] < temp_controller.boundary_temp:
+            if not temp_controller.notify:
+                temp_controller.notify = True
+                temp_controller.time_under = str(datetime.now()).split('.')
+        else:
+            temp_controller.notify = False
+            temp_controller.notify_timer = 0
+        
+        if temp_controller.notify:
+            # send notification every hour
+            if temp_controller.notify_timer == 0:
+                temp_controller.sendMail(str(data[1]))
+            if temp_controller.notify_timer >= 3600:
+                temp_controller.notify_timer = 0
+            else:
+                temp_controller.notify_timer += 120
         sleep(120)

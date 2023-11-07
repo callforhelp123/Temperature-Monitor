@@ -1,7 +1,9 @@
 1) In terminal, navigate to the folder where the zip contents have been unzipped 
-2) Delete token.pickle file
-3) pip install -r requirements
-4) python main.py
-5) If prompted with authorization sequence that uses terminal, let everything load into the Google API menu, then use the keyboard command to exit out.
-6) There should be an authorization URL that Google generated. Copy and paste that URL into a web browser and follow the instructions there.
-7) Hopefully it is working now... :thinkingemoji:
+2) Contact existing user for the credentials.json file, and paste it into the folder
+3) Delete token.pickle file
+4) pip install -r requirements
+5) python main.py
+6) If prompted with authorization sequence that uses terminal, let everything load into the Google API menu, then use the keyboard command to exit out.
+7) There should be an authorization URL that Google generated. Copy and paste that URL into a web browser and follow the instructions there.
+8) Hopefully it is working now... :thinkingemoji:
+
