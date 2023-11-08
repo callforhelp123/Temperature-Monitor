@@ -1,2 +1,4 @@
 credentials.json
 password.py
+__pycache__ 
+*.pyc
