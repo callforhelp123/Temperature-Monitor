@@ -187,10 +187,11 @@ class Sheets_Logging:
 
 class Temp_Controls:
     def __init__(self):
-        self.boundary_temp = 51
+        self.boundary_temp = 48.5 
         self.notify = False
         self.notify_timer = 0
         self.time_under = ""
+        self.emails = ["snowsoftj4c@gmail.com"]
     def measure_temp(self):
         """ measures temperature from raspberry Pi """
         owm_api_key = returnOWMAPIkey()
@@ -205,25 +206,38 @@ class Temp_Controls:
         date = datetime.now()
         return [str(date).split('.')[0], temp]
 
-    def sendMail(self, curr_temp):
+    def send_all_clear_mail(self):
         # initialize connection to gmail server
         smtp = smtplib.SMTP('smtp.gmail.com', 587) 
         smtp.ehlo() 
         smtp.starttls() 
         password = returnPassword()
-
         ##### credentials + email destinations goes here ######
         smtp.login('tempsensor486@gmail.com', password) 
-        to = ["snowsoftj4c@gmail.com"] 
-
+        to = self.emails
         # construct message
         msg = MIMEMultipart() 
-        msg['Subject'] = "Warning: Temperature at " + curr_temp + "F"
-        msg_body = "Temperature has been below " + str(self.boundary_temp) + "F since " + self.time_under[0]
+        msg['Subject'] = f"Temperature is now below {self.boundary_temp}"
+        msg_body = f"Spent from {temp_controller.time_under} to {str(datetime.now()).split('.')[0]} "
         msg.attach(MIMEText(msg_body))   
-
+        smtp.sendmail(from_addr="hello@gmail.com", 
+                    to_addrs=to, msg=msg.as_string()) 
+        smtp.quit()
     
-
+    def send_warning_mail(self, curr_temp):
+        # initialize connection to gmail server
+        smtp = smtplib.SMTP('smtp.gmail.com', 587) 
+        smtp.ehlo() 
+        smtp.starttls() 
+        password = returnPassword()
+        ##### credentials + email destinations goes here ######
+        smtp.login('tempsensor486@gmail.com', password) 
+        to = self.emails
+        # construct message
+        msg = MIMEMultipart() 
+        msg['Subject'] = f"Warning: Temperature at {curr_temp}F"
+        msg_body = f"Temperature has been above {self.boundary_temp}F since {self.time_under}"
+        msg.attach(MIMEText(msg_body))   
         smtp.sendmail(from_addr="hello@gmail.com", 
                     to_addrs=to, msg=msg.as_string()) 
         smtp.quit()
@@ -246,22 +260,26 @@ if __name__ == '__main__':
         except:
             print('error in google write')
 
-
         # email notification if temp is past boundary temp
-        if data[1] < temp_controller.boundary_temp:
+        if data[1] > temp_controller.boundary_temp:
             if not temp_controller.notify:
                 temp_controller.notify = True
-                temp_controller.time_under = str(datetime.now()).split('.')
+                temp_controller.time_under = str(datetime.now()).split('.')[0]
         else:
+            if temp_controller.notify:
+                temp_controller.send_all_clear_mail()
+                print("all clear notification sent")
             temp_controller.notify = False
             temp_controller.notify_timer = 0
         
         if temp_controller.notify:
             # send notification every hour
             if temp_controller.notify_timer == 0:
-                temp_controller.sendMail(str(data[1]))
+                temp_controller.send_warning_mail(str(data[1]))
+                print("warning notification sent")
             if temp_controller.notify_timer >= 3600:
                 temp_controller.notify_timer = 0
             else:
                 temp_controller.notify_timer += 120
+        print("interval_timer: ", temp_controller.notify_timer)
         sleep(120)
