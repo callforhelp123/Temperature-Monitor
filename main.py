@@ -218,7 +218,7 @@ class Temp_Controls:
         # construct message
         msg = MIMEMultipart() 
         msg['Subject'] = f"Temperature is now below {self.boundary_temp}"
-        msg_body = f"Spent from {temp_controller.time_under} to {str(datetime.now()).split('.')[0]} "
+        msg_body = f"Spent from {temp_controller.time_under} to {str(datetime.now()).split('.')[0]} out of range"
         msg.attach(MIMEText(msg_body))   
         smtp.sendmail(from_addr="hello@gmail.com", 
                     to_addrs=to, msg=msg.as_string()) 
