@@ -11,11 +11,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart 
 from password import returnPassword, returnOWMAPIkey
 
+
 class Sheets_Logging:
     """ this class holds the authorization service for the spreadsheet
         it also has all the functions necessary for interacting w/ Sheets API
     """
-    SPREADSHEET_ID = '121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM'
+    SPREADSHEET_ID = '1nAvq-uGnSVkHHjmMMmwkaOaDpgdE9fDkIV7JT8V5Kfw'
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets',
              'https://www.googleapis.com/auth/drive.file',
              'https://www.googleapis.com/auth/drive']
@@ -70,6 +71,7 @@ class Sheets_Logging:
             spreadsheetId=self.SPREADSHEET_ID, range=range_name,
             valueInputOption='USER_ENTERED', body=body).execute()
         print(values)
+
     def create_new_sheet(self, service, sheet_name):
         """ creates a new sheet at index 0. maintains a history of 31 days."""
         sheet_metadata = service.spreadsheets().get(spreadsheetId=self.SPREADSHEET_ID).execute()
@@ -110,7 +112,8 @@ class Sheets_Logging:
             spreadsheetId=self.SPREADSHEET_ID,
             body=batch_update_spreadsheet_request
         ).execute()
-    def create_chart(self, service, sheet_name):
+
+    def create_chart(self, service, sheet_name):       
         """ creates a line chart for the new sheet"""
         # Get the sheetId for the new sheet; dunno if can create chart in sheet by title, so using ID
         sheet_metadata = service.spreadsheets().get(spreadsheetId=self.SPREADSHEET_ID).execute()
@@ -185,13 +188,20 @@ class Sheets_Logging:
         # Execute the batchUpdate request to create the chart
         service.spreadsheets().batchUpdate(spreadsheetId=self.SPREADSHEET_ID, body={"requests": requests}).execute()
 
+
 class Temp_Controls:
+
     def __init__(self):
-        self.boundary_temp = 48.5 
+        # user controlled variables here
+        self.boundary_temp = 48.5  # in celsius (nerd in glasses emoji)
+        self.emails = ["snowsoftj4c@gmail.com"]  # separate by comma
+        self.notification_cooldown = 3600  # in seconds
+
+        # program variables, no touchy
         self.notify = False
         self.notify_timer = 0
         self.time_under = ""
-        self.emails = ["snowsoftj4c@gmail.com"]
+
     def measure_temp(self):
         """ measures temperature from raspberry Pi """
         owm_api_key = returnOWMAPIkey()
@@ -208,29 +218,28 @@ class Temp_Controls:
 
     def send_all_clear_mail(self):
         # initialize connection to gmail server
-        smtp = smtplib.SMTP('smtp.gmail.com', 587) 
-        smtp.ehlo() 
-        smtp.starttls() 
+        smtp = smtplib.SMTP('smtp.gmail.com', 587)
+        smtp.ehlo()
+        smtp.starttls()
         password = returnPassword()
-        ##### credentials + email destinations goes here ######
-        smtp.login('tempsensor486@gmail.com', password) 
+        # credentials + email destinations goes here
+        smtp.login('tempsensor486@gmail.com', password)
         to = self.emails
         # construct message
         msg = MIMEMultipart() 
         msg['Subject'] = f"Good news; temperature is now below {self.boundary_temp}"
         msg_body = f"Spent from {temp_controller.time_under} to {str(datetime.now()).split('.')[0]} out of range"
         msg.attach(MIMEText(msg_body))   
-        smtp.sendmail(from_addr="hello@gmail.com", 
-                    to_addrs=to, msg=msg.as_string()) 
+        smtp.sendmail(from_addr="hello@gmail.com", to_addrs=to, msg=msg.as_string())
         smtp.quit()
-    
+
     def send_warning_mail(self, curr_temp):
         # initialize connection to gmail server
         smtp = smtplib.SMTP('smtp.gmail.com', 587) 
         smtp.ehlo() 
         smtp.starttls() 
         password = returnPassword()
-        ##### credentials + email destinations goes here ######
+        # credentials + email destinations goes here 
         smtp.login('tempsensor486@gmail.com', password) 
         to = self.emails
         # construct message
@@ -266,19 +275,20 @@ if __name__ == '__main__':
                 temp_controller.notify = True
                 temp_controller.time_under = str(datetime.now()).split('.')[0]
         else:
+            # if temp has successfully recovered
             if temp_controller.notify:
                 temp_controller.send_all_clear_mail()
                 print("all clear notification sent")
             temp_controller.notify = False
             temp_controller.notify_timer = 0
-        
+
+        # send notification every hour
         if temp_controller.notify:
-            # send notification every hour
+            if temp_controller.notify_timer >= temp_controller.notification_cooldown:
+                temp_controller.notify_timer = 0
             if temp_controller.notify_timer == 0:
                 temp_controller.send_warning_mail(str(data[1]))
                 print("warning notification sent")
-            if temp_controller.notify_timer >= 3600:
-                temp_controller.notify_timer = 0
             else:
                 temp_controller.notify_timer += 120
         print("interval_timer: ", temp_controller.notify_timer)

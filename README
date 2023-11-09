@@ -1,8 +1,27 @@
-1) In terminal, navigate to the folder where the zip contents have been unzipped 
-2) Contact existing user for the credentials.json file, and paste it into the folder
-3) Delete token.pickle file
-4) pip install -r requirements ### whoops i need to actually make this file lol, shoudln't be too large though
-5) python main.py
-6) If prompted with authorization sequence that uses terminal, let everything load into the Google API menu, then use the keyboard command to exit out.
-7) There should be an authorization URL that Google generated. Copy and paste that URL into a web browser and follow the instructions there.
-8) Hopefully it is working now... :thinkingemoji:
+## Google Spreadsheet setup ## 
+- Ensure Google account is a developer account
+- Go to https://console.developers.google.com/ and create a new project
+- Click on the “+ Enable APIs and Services” button next to APIs & Services.
+- Enter in the search bar “Google Sheets API” and select the resulting API that appears, then click the Enable button for the API Library.
+- Go to Credentials in the left tab
+- Create a new OAuth Client ID
+- Select “Desktop App” as the application type
+- Once created, download the OAuth Client using the download icon underneath “actions”
+- This will download a .json file that you should rename to credentials.json
+- Copy and paste this file in the main program folder (same as where main.py, README are)
+- Create a Google Sheet where you want to store your data
+- Find the unique ID of the Google Sheet (the random string of letters and numbers after /d/, so 121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM in https://docs.google.com/spreadsheets/d/121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM)
+- Open main.py, and in the class Sheets_Logging, Copy and for the global variable SPREADSHEET_ID, replace the ID with the new unique ID
+
+
+## Initial Setup / Running the Program ##
+- In main.py, navigate to the class Temp_Controls
+    - Here, adjust the user controlled variables as you see fit
+- Contact an existing user for the password.py file (it is not included for security reasons on the repo)
+- Ensure that the password.py file is in the same folder as the credentials.json folder
+- In terminal, navigate to the program directory
+- pip install -r requirements
+- python main.py (<--- this runs the program until keyboard interrupt)
+- If prompted with authorization sequence that uses terminal, let everything load into the Google API menu, then use the keyboard command to exit out.
+- There should be an authorization URL that Google generated. Copy and paste that URL into a web browser and follow the instructions there.
+- Hopefully it is working now... :thinkingemoji:
