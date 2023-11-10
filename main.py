@@ -16,7 +16,7 @@ class Sheets_Logging:
     """ this class holds the authorization service for the spreadsheet
         it also has all the functions necessary for interacting w/ Sheets API
     """
-    SPREADSHEET_ID = '1nAvq-uGnSVkHHjmMMmwkaOaDpgdE9fDkIV7JT8V5Kfw'
+    SPREADSHEET_ID = '121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM'
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets',
              'https://www.googleapis.com/auth/drive.file',
              'https://www.googleapis.com/auth/drive']
@@ -289,7 +289,6 @@ if __name__ == '__main__':
             if temp_controller.notify_timer == 0:
                 temp_controller.send_warning_mail(str(data[1]))
                 print("warning notification sent")
-            else:
-                temp_controller.notify_timer += 120
+            temp_controller.notify_timer += 120
         print("interval_timer: ", temp_controller.notify_timer)
         sleep(120)
