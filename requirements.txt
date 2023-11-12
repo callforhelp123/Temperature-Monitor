@@ -1,2 +1,5 @@
 google-api-python-client
 google_auth_oauthlib
+adafruit-blinka
+adafruit-circuitpython-busdevice
+adafruit-circuitpython-max31856
