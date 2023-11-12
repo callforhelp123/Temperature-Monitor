@@ -29,3 +29,4 @@
 
 * have to install/run in a virtual environment...?
 * need to go to enable SPI interface for raspberry Pi
+* install vncserver on pi
