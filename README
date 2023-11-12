@@ -27,6 +27,9 @@
 - Hopefully it is working now... :thinkingemoji:
 
 
-* have to install/run in a virtual environment...?
-* need to go to enable SPI interface for raspberry Pi
+** to do **
+* have to install/run in a virtual environment
+* need to go to enable SPI interface for raspberry Pi in config
 * install vncserver on pi
+* set pi to autoboot
+* change .bashrc to run /path/... etc. main.py file to run on startup
