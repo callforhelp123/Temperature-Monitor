@@ -25,3 +25,7 @@
 - If prompted with authorization sequence that uses terminal, let everything load into the Google API menu, then use the keyboard command to exit out.
 - There should be an authorization URL that Google generated. Copy and paste that URL into a web browser and follow the instructions there.
 - Hopefully it is working now... :thinkingemoji:
+
+
+* have to install/run in a virtual environment...?
+* need to go to enable SPI interface for raspberry Pi
