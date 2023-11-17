@@ -13,6 +13,13 @@
 - Find the unique ID of the Google Sheet (the random string of letters and numbers after /d/, so 121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM in https://docs.google.com/spreadsheets/d/121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM)
 - Open main.py, and in the class Sheets_Logging, Copy and for the global variable SPREADSHEET_ID, replace the ID with the new unique ID
 
+## Raspberry Pi Setup
+* install vncserver on pi
+* have to install/run in a virtual environment
+* need to go to enable SPI interface for raspberry Pi in config
+* set pi to autoboot
+* change .bashrc to run /path/... etc. main.py file to run on startup
+
 
 ## Initial Setup / Running the Program ##
 - In main.py, navigate to the class Temp_Controls
@@ -21,15 +28,7 @@
 - Ensure that the password.py file is in the same folder as the credentials.json folder
 - In terminal, navigate to the program directory
 - pip install -r requirements
-- python main.py (<--- this runs the program until keyboard interrupt)
+- python main.py (<--- this will run the program until keyboard interrupt; we need to first authorize everything to work though)
 - If prompted with authorization sequence that uses terminal, let everything load into the Google API menu, then use the keyboard command to exit out.
-- There should be an authorization URL that Google generated. Copy and paste that URL into a web browser and follow the instructions there.
+    - There should be an authorization URL that Google generated into the Terminal. Copy and paste that URL into a web browser and follow the instructions there.
 - Hopefully it is working now... :thinkingemoji:
-
-
-** to do **
-* have to install/run in a virtual environment
-* need to go to enable SPI interface for raspberry Pi in config
-* install vncserver on pi
-* set pi to autoboot
-* change .bashrc to run /path/... etc. main.py file to run on startup
