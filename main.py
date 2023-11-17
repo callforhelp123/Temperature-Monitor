@@ -193,7 +193,7 @@ class Temp_Controls:
 
     def __init__(self):
         # user controlled variables here
-        self.boundary_temp = 48.5  # in celsius (nerd in glasses emoji)
+        self.boundary_temp = 52  # in celsius (nerd in glasses emoji)
         self.emails = ["snowsoftj4c@gmail.com"]  # separate by comma
         self.notification_cooldown = 3600  # in seconds
 
