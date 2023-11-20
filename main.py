@@ -1,6 +1,7 @@
 import pickle
 import requests
 import smtplib 
+import thermocouple
 from os import path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -193,7 +194,7 @@ class Temp_Controls:
 
     def __init__(self):
         # user controlled variables here
-        self.boundary_temp = 52  # will be in celsius, currently F
+        self.boundary_temp = 80  # in farenheit (nerd in glasses emoji)
         self.emails = ["snowsoftj4c@gmail.com"]  # separate by comma
         self.notification_cooldown = 3600  # in seconds
 
@@ -204,11 +205,16 @@ class Temp_Controls:
 
     def measure_temp(self):
         """ measures temperature from raspberry Pi """
+        """
         owm_api_key = returnOWMAPIkey()
         weather = requests.get(
             f"https://api.openweathermap.org/data/2.5/onecall?lat={47.6}&lon={-122.3}&exclude=minutely&appid={owm_api_key}&units=imperial")
         weather = weather.json()
         temp = weather["current"]["temp"]
+        """
+        temp = thermocouple.get_temp()
+        # freedom conversion
+        temp = ((9/5)*temp) + 32
         return temp
 
     def gen_data(self):
