@@ -28,10 +28,15 @@ Materials:
 * have to install/run programs in a virtual environment
 * need to go to enable SPI interface for raspberry Pi in config
 * set pi to autoboot in config as well
-* change .bashrc to run /path/... etc. main.py file to run on startup
+* in terminal
+    - nano .bashrc
+    - at the bottom, copy paste:
+        vncserver :1
+        sudo path/to/venv/bin/python main.py
 
 
 ## Initial Setup / Running the Program ##
+- unzip everything to the /home/{USERNAME} main directory
 - In main.py, navigate to the class Temp_Controls
     - Here, adjust the user controlled variables as you see fit
 - Contact an existing user for the password.py file (it is not included for security reasons on the repo)
