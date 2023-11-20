@@ -21,7 +21,7 @@ Materials:
     - This file will be copy pasted into the main program folder (same as where main.py, README are)
 - Create a Google Sheet where you want to store your data
 - Find the unique ID of the Google Sheet (the random string of letters and numbers after /d/, so 121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM in https://docs.google.com/spreadsheets/d/121BrpHHTBJlJzvaev-grbtioXInxn9LMmwMZwZadjQM)
-- Open main.py, and in the class Sheets_Logging, Copy and for the global variable SPREADSHEET_ID, replace the ID with the new unique ID
+- Open main.py, and in the class Sheets_Logging, there is a global variable SPREADSHEET_ID; replace the ID with the new unique ID
 
 ## Raspberry Pi Setup
 * install vncserver on pi
