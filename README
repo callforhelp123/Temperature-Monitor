@@ -24,6 +24,10 @@ Materials:
 - Open main.py, and in the class Sheets_Logging, there is a global variable SPREADSHEET_ID; replace the ID with the new unique ID
 
 ## Raspberry Pi Setup
+* Install MicroSD with SSH enabled by default, and w/ personal SSID/PW for ssh purposes
+* use Putty to connect to raspberrypi.local on port 22
+    * username: pi, password: raspberry
+* sudo apt-get update
 * install vncserver on pi
 * have to install/run programs in a virtual environment
 * need to go to enable SPI interface for raspberry Pi in config
@@ -31,9 +35,22 @@ Materials:
 * in terminal
     - nano .bashrc
     - at the bottom, copy paste:
-        vncserver :1
-        sudo path/to/venv/bin/python main.py
-
+       - vncserver :1
+       - sudo path/to/venv/bin/python main.py
+* If you need to add another network:
+    - sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+    - add:
+        - country=US 
+    - add networks below, in the following format (note: priority works highest number to smallest, so priority 3 gets run before priority 1)
+        - network = {
+          ssid = "INSERT"
+          psk = "INSERT"
+          priority = 2
+        }
+* if you need autoreboot:
+    - sudo crontab -e
+    - at the bottom, add:
+        - 0 0, 12 * * * reboot #this does midnight and 12PM
 
 ## Initial Setup / Running the Program ##
 - unzip everything to the /home/{USERNAME} main directory
