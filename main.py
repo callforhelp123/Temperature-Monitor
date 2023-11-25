@@ -196,7 +196,7 @@ class Temp_Controls:
 
     def __init__(self):
         # user controlled variables here
-        self.boundary_temp = 80  # in farenheit (nerd in glasses emoji)
+        self.boundary_temp = 80  # in the main loop, you can find "if data[1] > temp_controller.boundary_temp:", change the equality operator as needed
         self.emails = ["snowsoftj4c@gmail.com"]  # separate by comma
         self.notification_cooldown = 3600  # in seconds
 
@@ -206,7 +206,7 @@ class Temp_Controls:
         self.time_under = ""
 
     def gen_data(self):
-        temp = ((9/5)*thermocouple.temperature) + 32
+        temp = ((9/5)*thermocouple.temperature) + 32 # remove freedom conversion for scientific work
         date = datetime.now()
         return [str(date).split('.')[0], temp]
 
@@ -271,7 +271,7 @@ if __name__ == '__main__':
                     print(f'error in google write: {gsheet_error}')
 
                 # email notification if temp is past boundary temp
-                if data[1] > temp_controller.boundary_temp:
+                if data[1] > temp_controller.boundary_temp: # can change equality operator here as needed
                     if not temp_controller.notify:
                         temp_controller.notify = True
                         temp_controller.time_under = str(datetime.now()).split('.')[0]
