@@ -1,7 +1,9 @@
 import pickle
 import requests
 import smtplib 
-import thermocouple
+import board
+import digitalio
+import adafruit_max31856
 from os import path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -203,22 +205,8 @@ class Temp_Controls:
         self.notify_timer = 0
         self.time_under = ""
 
-    def measure_temp(self):
-        """ measures temperature from raspberry Pi """
-        """
-        owm_api_key = returnOWMAPIkey()
-        weather = requests.get(
-            f"https://api.openweathermap.org/data/2.5/onecall?lat={47.6}&lon={-122.3}&exclude=minutely&appid={owm_api_key}&units=imperial")
-        weather = weather.json()
-        temp = weather["current"]["temp"]
-        """
-        temp = thermocouple.get_temp()
-        # freedom conversion
-        temp = ((9/5)*temp) + 32
-        return temp
-
     def gen_data(self):
-        temp = self.measure_temp()
+        temp = ((9/5)*thermocouple.temperature) + 32
         date = datetime.now()
         return [str(date).split('.')[0], temp]
 
@@ -257,44 +245,51 @@ class Temp_Controls:
                     to_addrs=to, msg=msg.as_string()) 
         smtp.quit()
 
+def initialize_temp():
+        spi = board.SPI()
+        cs = digitalio.DigitalInOut(board.D5)
+        cs.direction = digitalio.Direction.OUTPUT
+        thermocouple = adafruit_max31856.MAX31856(spi,cs)   
+        return thermocouple   
 
 if __name__ == '__main__':
-    gsheet = Sheets_Logging()
-    temp_controller = Temp_Controls()
-    loop = True
-    while loop:
-        # retrieve temperature info
-        try:
-            data = temp_controller.gen_data()
-        except:
-            print('error in weather retrieval')
+        thermocouple = initialize_temp()
+        gsheet = Sheets_Logging()
+        temp_controller = Temp_Controls()
+        loop = True
+        while loop:
+                # retrieve temperature info
+                try:
+                    data = temp_controller.gen_data()
+                except Exception as data_error:
+                    print(f'error in weather retrieval: {data_error}')
 
-        # write to google sheet
-        try:
-            gsheet.write_data(data=data)
-        except:
-            print('error in google write')
+                # write to google sheet
+                try:
+                    gsheet.write_data(data=data)
+                except Exception as gsheet_error:
+                    print(f'error in google write: {gsheet_error}')
 
-        # email notification if temp is past boundary temp
-        if data[1] > temp_controller.boundary_temp:
-            if not temp_controller.notify:
-                temp_controller.notify = True
-                temp_controller.time_under = str(datetime.now()).split('.')[0]
-        else:
-            # if temp has successfully recovered
-            if temp_controller.notify:
-                temp_controller.send_all_clear_mail()
-                print("all clear notification sent")
-            temp_controller.notify = False
-            temp_controller.notify_timer = 0
+                # email notification if temp is past boundary temp
+                if data[1] > temp_controller.boundary_temp:
+                    if not temp_controller.notify:
+                        temp_controller.notify = True
+                        temp_controller.time_under = str(datetime.now()).split('.')[0]
+                else:
+                    # if temp has successfully recovered
+                    if temp_controller.notify:
+                        temp_controller.send_all_clear_mail()
+                        print("all clear notification sent")
+                    temp_controller.notify = False
+                    temp_controller.notify_timer = 0
 
-        # send notification every hour
-        if temp_controller.notify:
-            if temp_controller.notify_timer >= temp_controller.notification_cooldown:
-                temp_controller.notify_timer = 0
-            if temp_controller.notify_timer == 0:
-                temp_controller.send_warning_mail(str(data[1]))
-                print("warning notification sent")
-            temp_controller.notify_timer += 120
-        print("interval_timer: ", temp_controller.notify_timer)
-        sleep(120)
+                # send notification every hour
+                if temp_controller.notify:
+                    if temp_controller.notify_timer >= temp_controller.notification_cooldown:
+                        temp_controller.notify_timer = 0
+                    if temp_controller.notify_timer == 0:
+                        temp_controller.send_warning_mail(str(data[1]))
+                        print("warning notification sent")
+                    temp_controller.notify_timer += 120
+                print("interval_timer: ", temp_controller.notify_timer)
+                sleep(120)
