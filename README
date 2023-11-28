@@ -43,8 +43,8 @@ Materials:
         - country=US 
     - add networks below, in the following format (note: priority works highest number to smallest, so priority 3 gets run before priority 1)
         - network = {
-          ssid = "INSERT"
-          psk = "INSERT"
+          ssid = "Sample Network Here"
+          psk = "Password"
           priority = 2
         }
 * if you need autoreboot:
