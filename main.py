@@ -196,7 +196,7 @@ class Temp_Controls:
 
     def __init__(self):
         # user controlled variables here
-        self.boundary_temp = 80  # in the main loop, you can find "if data[1] > temp_controller.boundary_temp:", change the equality operator as needed
+        self.boundary_temp = -65  # in the main loop, you can find "if data[1] > temp_controller.boundary_temp:", change the equality operator as needed
         self.emails = ["snowsoftj4c@gmail.com"]  # separate by comma
         self.notification_cooldown = 3600  # in seconds
 
@@ -206,7 +206,7 @@ class Temp_Controls:
         self.time_under = ""
 
     def gen_data(self):
-        temp = ((9/5)*thermocouple.temperature) + 32 # remove freedom conversion for scientific work
+        temp = thermocouple.temperature # remove freedom conversion for scientific work
         date = datetime.now()
         return [str(date).split('.')[0], temp]
 
@@ -221,7 +221,7 @@ class Temp_Controls:
         to = self.emails
         # construct message
         msg = MIMEMultipart() 
-        msg['Subject'] = f"Good news; temperature is now below {self.boundary_temp}"
+        msg['Subject'] = f"Good news; temperature is now below {self.boundary_temp}C"
         msg_body = f"Spent from {temp_controller.time_under} to {str(datetime.now()).split('.')[0]} out of range"
         msg.attach(MIMEText(msg_body))   
         smtp.sendmail(from_addr="hello@gmail.com", to_addrs=to, msg=msg.as_string())
@@ -238,8 +238,8 @@ class Temp_Controls:
         to = self.emails
         # construct message
         msg = MIMEMultipart() 
-        msg['Subject'] = f"Warning: Temperature at {curr_temp}F"
-        msg_body = f"Temperature has been above {self.boundary_temp}F since {self.time_under}"
+        msg['Subject'] = f"Warning: Temperature at {curr_temp}C"
+        msg_body = f"Temperature has been above {self.boundary_temp}C since {self.time_under}"
         msg.attach(MIMEText(msg_body))   
         smtp.sendmail(from_addr="hello@gmail.com", 
                     to_addrs=to, msg=msg.as_string()) 
